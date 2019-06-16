@@ -3,9 +3,12 @@ workflows:
   build-deploy:
     jobs:
       - unit-test
-      - say-hello:
+      - publish-docker:
           requires:
             - unit-test
+          filters:
+            branches:
+              only: master
 
 version: 2
 jobs:
@@ -15,19 +18,82 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - currency-{{ checksum "pom.xml" }}
+            - currency
       - run: mvn dependency:go-offline
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: currency-{{ checksum "pom.xml" }}
       - run:
           name: Build and unit test
           command: |
             mvn test
+      - store_test_results:
+          path: target/surefire-reports
 
-  say-hello:
+
+  publish-docker:
     docker:
-      - image: circleci/node:4.8.2
+      - image: circleci/openjdk:11-jdk-browsers
     working_directory: ~/repo
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - currency-{{ checksum "pom.xml" }}
+            - currency
       - run:
-          name: Say Hello
+          name: Login to docker repo
+          command: docker login -u _json_key -p "$GOOGLE_AUTH" https://gcr.io
+      - run:
+          name: Build image
           command: |
-            echo Hello
+            mvn compile jib:build -DskipTests=true \
+              -Dbuild.number=${CIRCLE_BUILD_NUM} \
+              -Dcommit.hash=${CIRCLE_SHA1} \
+              -Dcircle.workflow.guid=${CIRCLE_WORKFLOW_ID} \
+              -Dbuild.user=${CIRCLE_PROJECT_USERNAME} \
+              -Dbuild.repo=${CIRCLE_PROJECT_REPONAME}
+      - run:
+          name: send echo when finish
+          command: |
+            echo success!
+
+
+
+#workflows:
+#  version: 2
+#  build-deploy:
+#    jobs:
+#      - unit-test
+#      - say-hello:
+#          requires:
+#            - unit-test
+#
+#version: 2
+#jobs:
+#  unit-test:
+#    docker:
+#      - image: circleci/openjdk:11-jdk
+#    working_directory: ~/repo
+#    steps:
+#      - checkout
+#      - run: mvn dependency:go-offline
+#      - run:
+#          name: Build and unit test
+#          command: |
+#            mvn test
+#
+#  say-hello:
+#    docker:
+#      - image: circleci/node:4.8.2
+#    working_directory: ~/repo
+#    steps:
+#      - checkout
+#      - run:
+#          name: Say Hello
+#          command: |
+#            echo Hello
