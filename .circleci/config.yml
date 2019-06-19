@@ -6,11 +6,18 @@ workflows:
       - publish-docker:
           requires:
             - unit-test
+      - deploy-on-k8s:
+          requires:
+            - publish-docker
           filters:
             branches:
               only: master
 
-version: 2
+#version: 2
+# This code is licensed from CircleCI to the user under the MIT license. See
+# https://circleci.com/orbs/registry/licensing for details.
+version: 2.1
+
 jobs:
   unit-test:
     docker:
@@ -51,51 +58,25 @@ jobs:
             mvn compile jib:build -DskipTests=true \
               -Dbuild.number=${CIRCLE_BUILD_NUM}
 
-      - run:
-          name: Deploy on Kubernetes
-          command: |
-            gcloud container clusters get-credentials currency-cicd --zone europe-north1-a --project fiery-iridium-235312
-            kubectl --record deployment.apps/currency-deployment --namespace currency-test set image deployment.v1.apps/currency-deployment currency-deployment=gcr.io/fiery-iridium-235312/test/currency:${CIRCLE_BUILD_NUM}
-            timeout 120 kubectl rollout status deployment.v1.apps/currency-deployment --namespace currency-test || kubectl rollout undo deployment.v1.apps/currency-deployment --namespace currency-test | exit 1"
+
+  deploy-on-k8s:
+    description: Google Kubernetes Engine (GKE) Orb
+    # Orb Dependencies
+    orbs:
+      gcloud: circleci/gcp-cli@1.0.6
+      gcr: circleci/gcp-gcr@0.0.2
+      k8s: circleci/kubernetes@0.1.0
+    commands:
+      install:
+        description: "Install `gcloud` and `kubectl` if not already installed."
+        steps:
+          - gcloud/install
+          - k8s/install
+          - run:
+              name: Deploy on Kubernetes
+              command: |
+                gcloud container clusters get-credentials currency-cicd --zone europe-north1-a --project fiery-iridium-235312
+                kubectl --record deployment.apps/currency-deployment --namespace currency-test set image deployment.v1.apps/currency-deployment currency-deployment=gcr.io/fiery-iridium-235312/test/currency:${CIRCLE_BUILD_NUM}
+                timeout 120 kubectl rollout status deployment.v1.apps/currency-deployment --namespace currency-test || kubectl rollout undo deployment.v1.apps/currency-deployment --namespace currency-test | exit 1"
 
 
-#      - run:
-#          name: send echo when finish
-#          command: |
-#            echo success!
-
-
-
-#workflows:
-#  version: 2
-#  build-deploy:
-#    jobs:
-#      - unit-test
-#      - say-hello:
-#          requires:
-#            - unit-test
-#
-#version: 2
-#jobs:
-#  unit-test:
-#    docker:
-#      - image: circleci/openjdk:11-jdk
-#    working_directory: ~/repo
-#    steps:
-#      - checkout
-#      - run: mvn dependency:go-offline
-#      - run:
-#          name: Build and unit test
-#          command: |
-#            mvn test
-#
-#  say-hello:
-#    docker:
-#      - image: circleci/node:4.8.2
-#    working_directory: ~/repo
-#    steps:
-#      - checkout
-#      - run:
-#          name: Say Hello
-#          command: |
-#            echo Hello
