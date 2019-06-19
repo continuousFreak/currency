@@ -17,7 +17,6 @@ workflows:
 # This code is licensed from CircleCI to the user under the MIT license. See
 # https://circleci.com/orbs/registry/licensing for details.
 version: 2.1
-  description: Google Kubernetes Engine (GKE) Orb
   # Orb Dependencies
   orbs:
     gcloud: circleci/gcp-cli@1.0.6
