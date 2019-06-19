@@ -28,6 +28,10 @@ version: 2
 #      steps:
 #        - gcloud/install
 #        - k8s/install
+orbs:
+  gcloud: circleci/gcp-cli@1.0.6
+  gcr: circleci/gcp-gcr@0.0.2
+  k8s: circleci/kubernetes@0.1.0
 
 jobs:
   unit-test:
@@ -54,10 +58,7 @@ jobs:
     docker:
       - image: circleci/openjdk:11-jdk-browsers
     working_directory: ~/repo
-    orbs:
-      gcloud: circleci/gcp-cli@1.0.6
-      gcr: circleci/gcp-gcr@0.0.2
-      k8s: circleci/kubernetes@0.1.0
+
 #    commands:
 #      install:
 #        description: "Install `gcloud` and `kubectl` if not already installed."
