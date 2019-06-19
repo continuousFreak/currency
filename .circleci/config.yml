@@ -31,9 +31,6 @@ jobs:
           name: Build and unit test
           command: |
             mvn test
-      - store_test_results:
-          path: target/surefire-reports
-
 
   publish-docker:
     docker:
@@ -53,10 +50,19 @@ jobs:
           command: |
             mvn compile jib:build -DskipTests=true \
               -Dbuild.number=${CIRCLE_BUILD_NUM}
+
       - run:
-          name: send echo when finish
+          name: Deploy on Kubernetes
           command: |
-            echo success!
+            gcloud container clusters get-credentials currency-cicd --zone europe-north1-a --project fiery-iridium-235312
+            kubectl --record deployment.apps/currency-deployment --namespace currency-test set image deployment.v1.apps/currency-deployment currency-deployment=gcr.io/fiery-iridium-235312/test/currency:${CIRCLE_BUILD_NUM}
+            timeout 120 kubectl rollout status deployment.v1.apps/currency-deployment --namespace currency-test || kubectl rollout undo deployment.v1.apps/currency-deployment --namespace currency-test | exit 1"
+
+
+#      - run:
+#          name: send echo when finish
+#          command: |
+#            echo success!
 
 
 
