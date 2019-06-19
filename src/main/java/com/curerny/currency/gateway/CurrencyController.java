@@ -18,11 +18,11 @@ public class CurrencyController {
 
     @GetMapping("/currency/{currency}/{date}")
     public CurrencyResponse getResponse(@PathVariable Currency currency, @PathVariable String date) {
-        System.out.println("Currency: " + currency);
-        System.out.println("Date: " + date);
+//        System.out.println("Currency: " + currency);
+//        System.out.println("Date: " + date);
 
         CurrencyResponse response = currencyService.getResponse(currency, LocalDate.parse(date));
-        System.out.println("RESPONSE: " + response);
+//        System.out.println("RESPONSE: " + response);
         return response;
     }
 
