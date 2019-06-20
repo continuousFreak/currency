@@ -67,11 +67,11 @@ jobs:
 #          - k8s/install
     steps:
       - run:
-          - name: install gcloud
-          - command: gcloud/install
+          name: install gcloud
+          command: gcloud/install
       - run:
-          - name: install k8s
-          - command: k8s/install
+          name: install k8s
+          command: k8s/install
       - checkout
       - restore_cache:
           keys:
