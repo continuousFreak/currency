@@ -28,10 +28,10 @@ version: 2
 #      steps:
 #        - gcloud/install
 #        - k8s/install
-orbs:
-  gcloud: circleci/gcp-cli@1.0.6
-  gcr: circleci/gcp-gcr@0.0.2
-  k8s: circleci/kubernetes@0.1.0
+#orbs:
+#  gcloud: circleci/gcp-cli@1.0.6
+#  gcr: circleci/gcp-gcr@0.0.2
+#  k8s: circleci/kubernetes@0.1.0
 
 jobs:
   unit-test:
@@ -67,11 +67,12 @@ jobs:
 #          - k8s/install
     steps:
       - run:
-          name: install gcloud
-          command: gcloud/install
+          name: circleci/gcp-cli@1.0.6
+#          name: install gcloud
+          command: circleci/gcp-cli@1.0.6/install
       - run:
           name: install k8s
-          command: k8s/install
+          command: circleci/kubernetes@0.1.0/install
       - checkout
       - restore_cache:
           keys:
