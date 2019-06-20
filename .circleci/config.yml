@@ -47,7 +47,7 @@ jobs:
             - currency
       - run:
           name: Login to docker repo
-          command: docker login -u _json_key -p "$GOOGLE_AUTH" https://gcr.io
+          command: docker login -u _json_key -p "$GCLOUD_SERVICE_KEY" https://gcr.io
       - run:
           name: Build image
           command: |
