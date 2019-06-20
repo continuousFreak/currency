@@ -89,8 +89,6 @@ jobs:
             timeout 120 kubectl rollout status deployment.v1.apps/${PROJECT_NAME} || kubectl rollout undo deployment.v1.apps/${PROJECT_NAME} | exit 1
 
 
-
-
 #            envsubst < ${HOME}/project/k8s.yml > ${HOME}/patched_k8s.yml
 #            kubectl apply -f ${HOME}/patched_k8s.yml
 #            kubectl rollout status deployment/${PROJECT_NAME}
