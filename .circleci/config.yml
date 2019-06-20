@@ -85,13 +85,19 @@ jobs:
       - run:
           name: Deploy to Kubernetes
           command: |
-            kubectl --record deployment.apps/${PROJECT_NAME} set image deployments/${PROJECT_NAME} ${PROJECT_NAME}=gcr.io/fiery-iridium-235312/test/${PROJECT_NAME}:$(( ${CIRCLE_BUILD_NUM}-1 ))
-            timeout 120 kubectl rollout status deployment.v1.apps/${PROJECT_NAME} || kubectl rollout undo deployment.v1.apps/${PROJECT_NAME} | exit 1
+            envsubst < ${HOME}/project/k8s.yml > ${HOME}/patched_k8s.yml
+            kubectl apply -f ${HOME}/patched_k8s.yml
+            kubectl rollout status deployment/${PROJECT_NAME}
 
 
-#            envsubst < ${HOME}/project/k8s.yml > ${HOME}/patched_k8s.yml
-#            kubectl apply -f ${HOME}/patched_k8s.yml
-#            kubectl rollout status deployment/${PROJECT_NAME}
+
+
+
+#            kubectl --record deployment.apps/${PROJECT_NAME} set image deployments/${PROJECT_NAME} ${PROJECT_NAME}=gcr.io/fiery-iridium-235312/test/${PROJECT_NAME}:$(( ${CIRCLE_BUILD_NUM}-1 ))
+#            timeout 120 kubectl rollout status deployment.v1.apps/${PROJECT_NAME} || kubectl rollout undo deployment.v1.apps/${PROJECT_NAME} | exit 1
+
+
+
 
 
 
