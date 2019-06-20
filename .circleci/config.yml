@@ -9,7 +9,9 @@ workflows:
           filters:
             branches:
               only: master
-
+      - deploy-on-kubernetes:
+          requires:
+            - publish-docker
 
 version: 2
 jobs:
@@ -37,7 +39,6 @@ jobs:
     docker:
       - image: circleci/openjdk:11-jdk-browsers
     working_directory: ~/repo
-
     steps:
       - checkout
       - restore_cache:
@@ -57,11 +58,34 @@ jobs:
               -Dbuild.user=${CIRCLE_PROJECT_USERNAME} \
               -Dbuild.repo=${CIRCLE_PROJECT_REPONAME}
 
+  deploy-on-kubernetes:
+    docker:
+      - image: google/cloud-sdk   # official google SDK image - include gcloud kubectl etc.
+    environment:
+      - PROJECT_NAME: "currency"
+      - GOOGLE_PROJECT_ID: "fiery-iridium-235312"
+      - GOOGLE_COMPUTE_ZONE: "europe-north1-a"
+      - GOOGLE_CLUSTER_NAME: "currency-cicd"
+    steps:
+      - checkout
+      - run:
+          name: Setup Google Cloud SDK   #gettext to narzędzie zaw. m.in envsubst dzieki niemu mozemy w locie tworzyc zmienne i przypisywac im wartosci
+          command: |
+            apt-get install -qq -y gettext
+            echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+            gcloud --quiet container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
+
+      - run:
+          name: echo some variables
+          command: |
+            echo circle build num is $(( ${CIRCLE_BUILD_NUM}-1 ))
+      - run:
+          name: Deploy to Kubernetes
+          command: |
+            kubectl --record deployment.apps/${PROJECT_NAME} set image deployments/${PROJECT_NAME} ${PROJECT_NAME}=gcr.io/fiery-iridium-235312/test/${PROJECT_NAME}:$(( ${CIRCLE_BUILD_NUM}-1 ))
+            timeout 120 kubectl rollout status deployment.v1.apps/${PROJECT_NAME} || kubectl rollout undo deployment.v1.apps/${PROJECT_NAME} | exit 1
 
 
-#      - run:
-#          name: Deploy on Kubernetes
-#          command: |
-#            gcloud container clusters get-credentials currency-cicd --zone europe-north1-a --project fiery-iridium-235312
-#            kubectl --record deployment.apps/currency-deployment --namespace currency-test set image deployment.v1.apps/currency-deployment currency-deployment=gcr.io/fiery-iridium-235312/test/currency:${CIRCLE_BUILD_NUM}
-#            timeout 120 kubectl rollout status deployment.v1.apps/currency-deployment --namespace currency-test || kubectl rollout undo deployment.v1.apps/currency-deployment --namespace currency-test | exit 1"
