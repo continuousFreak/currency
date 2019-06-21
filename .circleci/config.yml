@@ -58,14 +58,15 @@ jobs:
               -Dbuild.user=${CIRCLE_PROJECT_USERNAME} \
               -Dbuild.repo=${CIRCLE_PROJECT_REPONAME}
 
+
   deploy-on-kubernetes:
     docker:
       - image: google/cloud-sdk   # official google SDK image - include gcloud kubectl etc.
     environment:
       - PROJECT_NAME: "currency"
       - GOOGLE_PROJECT_ID: "fiery-iridium-235312"
-      - GOOGLE_COMPUTE_ZONE: "europe-north1-a"
-      - GOOGLE_CLUSTER_NAME: "currency-cicd"
+      - GOOGLE_COMPUTE_ZONE: "us-central1-a"
+      - GOOGLE_CLUSTER_NAME: "cicd-test"
     steps:
       - checkout
       - run:
@@ -85,14 +86,9 @@ jobs:
       - run:
           name: Deploy to Kubernetes
           command: |
-            kubectl --record deployment.apps/${PROJECT_NAME} set image deployments/${PROJECT_NAME} ${PROJECT_NAME}=gcr.io/fiery-iridium-235312/test/${PROJECT_NAME}:$(( ${CIRCLE_BUILD_NUM}-1 ))
-            timeout 120 kubectl rollout status deployment.v1.apps/${PROJECT_NAME} || kubectl rollout undo deployment.v1.apps/${PROJECT_NAME} | exit 1
-
-
-
-#            envsubst < ${HOME}/project/k8s.yml > ${HOME}/patched_k8s.yml
-#            kubectl apply -f ${HOME}/patched_k8s.yml
-#            kubectl rollout status deployment/${PROJECT_NAME}
+            envsubst < ${HOME}/project/k8s.yml > ${HOME}/patched_k8s.yml
+            kubectl apply -f ${HOME}/patched_k8s.yml
+            kubectl rollout status deployment/${PROJECT_NAME}
 
 
 
@@ -109,7 +105,8 @@ jobs:
 
 
 
-
+#            kubectl --record deployment.apps/${PROJECT_NAME} set image deployments/${PROJECT_NAME} ${PROJECT_NAME}=gcr.io/fiery-iridium-235312/test/${PROJECT_NAME}:$(( ${CIRCLE_BUILD_NUM}-1 ))
+#            timeout 120 kubectl rollout status deployment.v1.apps/${PROJECT_NAME} || kubectl rollout undo deployment.v1.apps/${PROJECT_NAME} | exit 1
 
 
 #            kubectl --record deployment.apps/${PROJECT_NAME} set image deployments/${PROJECT_NAME} ${PROJECT_NAME}=gcr.io/fiery-iridium-235312/test/${PROJECT_NAME}:$(( ${CIRCLE_BUILD_NUM}-1 ))
