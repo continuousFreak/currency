@@ -111,12 +111,12 @@ jobs:
 
 
 
-
-
-    kubectl --record deployment.apps/currency set image deployment.v1.apps/currency currency=gcr.io/fiery-iridium-235312/test/currency:$(( ${CIRCLE_BUILD_NUM}-1 ))
-    timeout 120 kubectl rollout status deployment.v1.apps/currency || kubectl rollout undo deployment.v1.apps/currency | exit 1
-
-
+#
+#
+#    kubectl --record deployment.apps/currency set image deployment.v1.apps/currency currency=gcr.io/fiery-iridium-235312/test/currency:$(( ${CIRCLE_BUILD_NUM}-1 ))
+#    timeout 120 kubectl rollout status deployment.v1.apps/currency || kubectl rollout undo deployment.v1.apps/currency | exit 1
+#
+#
 
 
 
