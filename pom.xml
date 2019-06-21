@@ -19,10 +19,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<build.number>000</build.number>
-		<!--<commit.hash>local-build</commit.hash>-->
-		<!--<build.user>local-build</build.user>-->
-		<!--<build.repo>local-build</build.repo>-->
-		<!--<circle.workflow.guid>local-build</circle.workflow.guid>-->
+		<commit.hash>local-build</commit.hash>
+		<build.user>local-build</build.user>
+		<build.repo>local-build</build.repo>
+		<circle.workflow.guid>local-build</circle.workflow.guid>
 	</properties>
 
 	<dependencies>
