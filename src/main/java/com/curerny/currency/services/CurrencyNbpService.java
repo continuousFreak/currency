@@ -53,7 +53,7 @@ public class CurrencyNbpService implements CurrencyService {
 
             BigDecimal rate = new BigDecimal(rateString);
 
-            return new CurrencyResponse(rate, effectiveDate, tableNo);
+            return new CurrencyResponse(currency, rate, effectiveDate, tableNo);
         }
 
         catch (FileNotFoundException ex) {
