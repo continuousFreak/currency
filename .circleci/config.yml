@@ -50,14 +50,15 @@ jobs:
           command: docker login -u _json_key -p "$GCLOUD_SERVICE_KEY" https://gcr.io
 
       - run:
-          name: datadg docker agent
-          command: docker run -d -v /var/run/docker.sock:/var/run/docker.sock:ro \
-                -v /proc/:/host/proc/:ro \
-                -v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro \
-                -p 8126:8126/tcp \
-                -e DD_API_KEY=0733611a3a99ffe619f788dbb1cc6972 \
-                -e DD_APM_ENABLED=true \
-                datadog/agent:latest
+          name: datadog docker agent
+          command: |
+            docker run -d -v /var/run/docker.sock:/var/run/docker.sock:ro \
+              -v /proc/:/host/proc/:ro \
+              -v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro \
+              -p 8126:8126/tcp \
+              -e DD_API_KEY=0733611a3a99ffe619f788dbb1cc6972 \
+              -e DD_APM_ENABLED=true \
+              datadog/agent:latest
 
       - run:
           name: Build image
