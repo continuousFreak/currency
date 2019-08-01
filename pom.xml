@@ -46,28 +46,8 @@
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
 		</dependency>
-
-		<dependency>
-			<groupId>com.datadoghq</groupId>
-			<artifactId>dd-trace-api</artifactId>
-			<version>0.31.0</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/com.datadoghq/dd-java-agent -->
-		<dependency>
-			<groupId>com.datadoghq</groupId>
-			<artifactId>dd-java-agent</artifactId>
-			<version>0.31.0</version>
-		</dependency>
 	</dependencies>
 
-	<!--<build>-->
-		<!--<plugins>-->
-			<!--<plugin>-->
-				<!--<groupId>org.springframework.boot</groupId>-->
-				<!--<artifactId>spring-boot-maven-plugin</artifactId>-->
-			<!--</plugin>-->
-		<!--</plugins>-->
-	<!--</build>-->
 
 	<build>
 		<plugins>
@@ -75,24 +55,6 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-fixed-lib</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<includeScope>runtime</includeScope>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
 
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
