@@ -27,7 +27,7 @@ public class CurrencyController {
     @GetMapping("/")
     public CurrencyResponse homePage() {
 
-        Currency currency = Currency.GBP;
+        Currency currency = Currency.EUR;
         LocalDate localDate = LocalDate.now();
 
         CurrencyResponse response = currencyService.getResponse(currency, localDate);
